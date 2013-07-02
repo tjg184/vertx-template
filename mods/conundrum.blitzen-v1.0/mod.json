@@ -1,0 +1,5 @@
+{
+  "main" : "blitzen.groovy",
+  "worker" : true,
+  "auto-redeploy" : false
+}

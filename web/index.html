@@ -1,0 +1,160 @@
+<html lang="en">
+
+<meta charset="UTF-8">
+
+<head>
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="css/prettify.css" rel="stylesheet" media="screen">
+  <link href="css/timeline.css" rel="stylesheet" media="screen">
+  <link href="css/graph.css" rel="stylesheet" media="screen">
+  
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  
+  <script src='js3rdparty/prettify.js'></script>
+  <script src='js3rdparty/vkbeautify.0.99.00.beta.js'></script> <!-- XML formatting -->
+  
+  <script src='js3rdparty/jquery-1.7.1.min.js'></script>
+  <script src='js3rdparty/moment.min.js'></script> <!-- Date formatting -->
+  <script src='js3rdparty/bootstrap.min.js'></script>
+  
+  <script src="js3rdparty/timeline-min.js" type="text/javascript"></script>
+  <script src="js3rdparty/graph-min.js" type="text/javascript"></script>
+  
+  <title>Blitzen Cloud</title>
+</head>
+
+<body bgcolor="white">
+
+<div class="container">
+
+<div class="navbar navbar-inverse">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="brand" href="#">Blitzen Cloud</a>
+			<div class="nav-collapse">
+				<ul class="nav">
+					<li class="active">
+						<a href="#">Home</a>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">CSA</a>
+						<ul class="dropdown-menu">
+							 <li><a id="duplicateInquiries" href="#">Duplicate Policy Inquiries</a></li>
+	                         <li class="divider"></li>
+	                         <li class="nav-header">Header</li>
+	                         <li><a href="#">Separated action</a></li>
+						</ul>
+					</li>
+				</ul>
+				<form class="navbar-search pull-left" data-bind="submit: onSearch">
+					<input type="text" class="search-query input-xxlarge" placeholder="Search"></input>
+   	            </form>						
+			</div>
+		</div>
+	</div>
+</div>
+
+<div data-bind="visible: activeFrame() == 'search'">
+	<div data-bind="foreach: searchErrors()">
+		<div class="alert">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+		  	<strong data-bind="text: searchTerm"></strong> <strong>></strong> <span data-bind="text: description"></span>
+		</div>
+	</div>
+
+	<h3><strong data-bind="text: searchResults().length"></strong> results</h3>
+
+	<div data-bind="timeline: searchResults"></div>
+
+	<table class="table table-hover table-condensed">
+		<thead>
+			<tr>
+				<td><b>Date</b></td>
+				<td><b>Activity</b></td>
+				<td><b>Request</b></td>
+				<td><b>Response</b></td>
+				<td><b>Details</b></td>
+			</tr>
+		</thead>
+		<tbody data-bind="foreach: filteredSearchResults">
+			<tr data-bind="highlightError: error, attr : { id : ko.utils.arrayIndexOf(viewModel.searchResults(), $data) }">
+				<td data-bind="dateFormat: timestamp"></td>
+				<td data-bind="text: label"></td>
+				<td>
+					<a data-bind="attr: { href : '#requestModal' + $index()}" role="button" 
+						class="btn" data-toggle="modal">View Request</a>
+					<div data-bind="attr: { id : 'requestModal' + $index(), 'aria-labelledby' : 'requestModalLabel' + $index() }" 
+						class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						    <h3 data-bind="attr: { id: 'requestModalLabel' + $index() }">Request View</h3>						    
+						</div>
+						<div class="modal-body">
+							<pre data-bind="text: fullRequest" class="prettyprint"></pre>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+		  					<button class="btn">Run in Unit</button>
+		  					<button class="btn">Run in Devl</button>
+		  					<button class="btn">Run in Test</button>
+						</div>
+					</div>
+				</td>
+				<td>
+					<a data-bind="attr: { href : '#responseModal' + $index()}" role="button" 
+						class="btn" data-toggle="modal">View Response</a>
+					<div data-bind="attr: { id : 'responseModal' + $index(), 'aria-labelledby' : 'responseModalLabel' + $index() }" 
+						class="modal hide fade" tabindex="-1" role="dialog" aria-hidden="true">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+						    <h3 data-bind="attr: { id: 'responseModalLabel' + $index() }">Response View</h3>						    
+						</div>
+						<div class="modal-body">
+							<pre data-bind="text: fullResponse" class="prettyprint"></pre>
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+						</div>
+					</div>
+				</td>
+				<td>
+					<span>Other details here...</span>
+				</td>
+			</tr>				
+		</tbody>
+	</table>
+</div>
+
+<div data-bind="visible: activeFrame() == 'graph'">
+	<h4 data-bind="text: graphTitle"></h4>
+	
+	<div data-bind="graph: graphDataSets"></div>
+</div>
+
+<div data-bind="visible: activeFrame() == 'welcome'">
+	<div class="row">
+		<p class="span11">Welcome to Blitzen Cloud!</p>
+	</div>
+</div>
+
+</div>
+
+</body>
+
+<script type="text/javascript">
+	function onSearch(formElement) {
+	 	this.search($(formElement).find('input').val());
+	}
+	
+	$('#duplicateInquiries').click(function() {
+		viewModel.graph('duplicatePolicyInquiries');
+	});
+</script>
+
+<script src='js3rdparty/sockjs-0.2.1.min.js'></script>
+<script src='js3rdparty/knockout-2.2.0.js'></script>
+<script src='js/visualization-bindings.js'></script>
+<script src='js/vertxbus.js'></script>
+<script src='js/viewmodel.js'></script>
+
+</html>
